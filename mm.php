@@ -1,28 +1,22 @@
-<?
-	
-include("config.inc.php");
-$db = mysqli_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS,$SESS_DBNAME);
-
-	function materialReport_summary($siow,$dayesGone,$duration,$project,$edate){
-include("config.inc.php");
-$db = mysqli_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS,$SESS_DBNAME);
+<? include('./includes/session.inc.php')?>
+<? function materialReport_summary($siow,$dayesGone,$duration,$project,$edate){
 $ed=formatDate($edate,'Y-m-d');
 $sqls1 = "SELECT sum(issuedQty*issueRate) as totalAmount from `issue$project` WHERE siowId='$siow' AND issueDate<='$ed' ";
 //echo $sqls1;
-$sqlruns1= mysqli_query($db, $sqls1);
-$out = mysqli_fetch_array($sqlruns1);
+$sqlruns1= mysql_query($sqls1);
+$out = mysql_fetch_array($sqlruns1);
 if($out[totalAmount])echo "<tr><td colspan=4 align=right><b>Total Expense till $edate is Tk. ".number_format($out[totalAmount],2)."</b></td></tr>";
 }
 ?>
 <? function equipmentReport_summary($siow,$dayesGone,$duration,$project,$edate){
 include("config.inc.php");
-$db = mysqli_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS, $SESS_DBNAME);
-	
+$db = mysql_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS);
+	mysql_select_db($SESS_DBNAME,$db);
 $sqls = "SELECT * from `dma` WHERE dmasiow='$siow' AND dmaItemCode BETWEEN '50-00-000' AND '69-99-999'";
 //echo $sqlp;
-$sqlruns= mysqli_query($db, $sqls);
+$sqlruns= mysql_query($sqls);
 
- while($redma= mysqli_fetch_array($sqlruns)){ 
+ while($redma= mysql_fetch_array($sqlruns)){ 
     //$d=formatDate($d,'Y-m-d');
 
    	 $duration=$duration;//round((strtotime($cd)-strtotime($sd))/(84000));
@@ -58,13 +52,13 @@ if($GteqTotalWorksiowtk)echo "<tr bgcolor=#FFDDDD><td colspan=4 align=right><b>T
 }?>
 <? function humanReport_summary($siow,$dayesGone,$duration,$project){
 include("config.inc.php");
-$db = mysqli_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS, $SESS_DBNAME);
-	
+$db = mysql_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS);
+	mysql_select_db($SESS_DBNAME,$db);
 $sqls = "SELECT * from `dma` WHERE dmasiow='$siow' AND dmaItemCode BETWEEN '70-00-000' AND '99-99-999'";
 //echo $sqlp;
-$sqlruns= mysqli_query($db, $sqls);
+$sqlruns= mysql_query($sqls);
 
- while($redma= mysqli_fetch_array($sqlruns)){ 
+ while($redma= mysql_fetch_array($sqlruns)){ 
 
    	 $duration=$duration;//round((strtotime($cd)-strtotime($sd))/(84000));
 	// echo $duration.'-';
@@ -103,13 +97,13 @@ if($GtempTotalWorksiowtk)echo "<tr bgcolor=#DDDDFF><td colspan=4 align=right><b>
 
 <? function materialReport($siow,$dayesGone,$duration,$project,$ed){
  include("config.inc.php");
-$db = mysqli_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS, $SESS_DBNAME);
-	
+$db = mysql_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS);
+	mysql_select_db($SESS_DBNAME,$db);
 $sqls = "SELECT * from `dma` WHERE dmasiow='$siow' AND dmaItemCode<'35-00-000'";
 //echo $sqls;
-$sqlruns= mysqli_query($db, $sqls);
+$sqlruns= mysql_query($sqls);
 
- while($redma= mysqli_fetch_array($sqlruns)){ 
+ while($redma= mysql_fetch_array($sqlruns)){ 
 ?>
    <tr>
    <td  ><? echo '<font class=out>'.$redma[dmaItemCode].'</font>';
@@ -131,18 +125,11 @@ $sqlruns= mysqli_query($db, $sqls);
 		if($duration>0){	$perdayQty=$redma[dmaQty]/$duration;} else $perdayQty=0;
 		 $qty=round($dayesGone*$perdayQty);
 		 $pqty = round(($qty*100)/$redma[dmaQty]); 
-				
-				if(global $zeroDecimal==1)
-		$qty=number_format($qty,0);
-				
 		 echo "$qty $temp[unit] ( $pqty% )";
 	 }
 	 ?>
 	</td>
-   <td align="right"><?  $issuedQt=issuedQty($siow,$redma[dmaItemCode],$redma[dmaQty],$temp[unit],$project,$ed);
-																						
-		 echo $issuedQt;
-		 ?></td>
+   <td align="right"><? echo issuedQty($siow,$redma[dmaItemCode],$redma[dmaQty],$temp[unit],$project,$ed);?></td>
   <!-- <td align="right"><? echo issuedEx($siow,$redma[dmaItemCode],$redma[dmaQty],$temp[unit],$project,$ed);?></td>-->
   <td align="right">
   <a target="_blank" href="./store/site_issue.php?siow=<? echo $siow;?>&itemCode=<? echo $redma[dmaItemCode];?>&edate=<? echo $ed;?>"> issue</a></td>
@@ -156,13 +143,13 @@ $sqlruns= mysqli_query($db, $sqls);
 
 <? function equipmentReport($siow,$dayesGone,$duration,$project,$ed){?>
 <? include("config.inc.php");
-$db = mysqli_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS, $SESS_DBNAME);
-	
+$db = mysql_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS);
+	mysql_select_db($SESS_DBNAME,$db);
 $sqls = "SELECT * from `dma` WHERE dmasiow='$siow' AND dmaItemCode BETWEEN '50-00-000' AND '69-99-999'";
 //echo $sqlp;
-$sqlruns= mysqli_query($db, $sqls);
+$sqlruns= mysql_query($sqls);
 
- while($redma= mysqli_fetch_array($sqlruns)){ 
+ while($redma= mysql_fetch_array($sqlruns)){ 
 ?>
    <tr bgcolor="#FFDDDD">
    <td ><? echo '<font class=out>'.$redma[dmaItemCode].'</font>';
@@ -198,9 +185,7 @@ $sqlruns= mysqli_query($db, $sqls);
    $eqTotalWorksiowptk=($eqTotalWorksiowtk*100)/( $redma[dmaQty]*$redma[dmaRate]);
    
    $eqTotalWorksiow = sec2hms($eqTotalWorksiow/3600,$padHours=false);
-   //$eqTotalWorksiowp = sec2hms($eqTotalWorksiowp/3600,$padHours=false);
-	if(global $zeroDecimal==1)
-		$eqTotalWorksiow=number_format($eqTotalWorksiow,0);
+   //$eqTotalWorksiowp = sec2hms($eqTotalWorksiowp/3600,$padHours=false);   
    echo "$eqTotalWorksiow Hr. (".number_format($eqTotalWorksiowp)."%)";
 ?>
    </td>
@@ -217,8 +202,8 @@ where pCode='$project' AND itemCode='$redma[dmaItemCode]'
  AND  status>=1 AND (('$ed' BETWEEN receiveDate AND edate) OR ('$ed' >= receiveDate AND edate='0000-00-00' ))
  ORDER by assetId ASC ";
 //echo $sqlquery.'<br>';
- $sql= mysqli_query($db, $sqlquery);
- while($re=mysqli_fetch_array($sql)){ 
+ $sql= mysql_query($sqlquery);
+ while($re=mysql_fetch_array($sql)){ 
   $type=eqType($re[assetId]);
  if(eq_isPresent($re[assetId],$re[itemCode],$ed)>=1){   
 echo "<a target=_blank href='./equipment/eqUtilization.php?siow=$siow&eqId=$re[assetId]
@@ -243,13 +228,13 @@ echo "</a><br>";
 
 <? function humanReport($siow,$dayesGone,$duration,$project,$ed){
 include("config.inc.php");
-$db = mysqli_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS, $SESS_DBNAME);
-	
+$db = mysql_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS);
+	mysql_select_db($SESS_DBNAME,$db);
 $sqls = "SELECT * from `dma` WHERE dmasiow='$siow' AND dmaItemCode BETWEEN '70-00-000' AND '97-99-999'";
 //echo $sqlp;
-$sqlruns= mysqli_query($db, $sqls);
+$sqlruns= mysql_query($sqls);
 
- while($redma= mysqli_fetch_array($sqlruns)){ 
+ while($redma= mysql_fetch_array($sqlruns)){ 
 ?>
    <tr bgcolor="#DDDDFF">
    <td ><? echo '<font class=out>'.$redma[dmaItemCode].'</font>';
@@ -298,8 +283,8 @@ $sqlquery="SELECT attendance.*,employee.designation FROM attendance,employee".
 " AND action in('P','HP') AND attendance.empId=employee.empId".
 " AND employee.designation='$redma[dmaItemCode]' ORDER by designation ASC ";
 //echo "$sqlquery<br>";
- $sql= mysqli_query($db, $sqlquery);
- while($re=mysqli_fetch_array($sql)){
+ $sql= mysql_query($sqlquery);
+ while($re=mysql_fetch_array($sql)){
  $designation =$re[designation];
  $empId=empId($re[empId],$designation);?>
 <a target="_blank" href="./employee/empUtilization.php?siow=<? echo $siow;?>&empId=<? echo $re[empId];?>
@@ -317,13 +302,13 @@ $sqlquery="SELECT attendance.*,employee.designation FROM attendance,employee".
 <? function subcontractorReport($siow,$dayesGone,$duration,$project,$ed){
 
  include("config.inc.php");
-$db = mysqli_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS, $SESS_DBNAME);
-	
+$db = mysql_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS);
+	mysql_select_db($SESS_DBNAME,$db);
 $sqls = "SELECT * from `dma` WHERE dmasiow='$siow' AND dmaItemCode BETWEEN '99-00-000' AND '99-99-999'";
 //echo $sqls;
-$sqlruns= mysqli_query($db, $sqls);
+$sqlruns= mysql_query($sqls);
 $f=1;
- while($redma= mysqli_fetch_array($sqlruns)){ 
+ while($redma= mysql_fetch_array($sqlruns)){ 
  if($f==1)
  echo " <tr><td colspan=4 bgcolor=#9900FF height=10 align=center><font class=englishhead>Sub-Contract</font></td></tr>";  
  $f=2; 
@@ -360,9 +345,9 @@ $f=1;
 itemCode ='$redma[dmaItemCode]' AND location='$project'
  ORDER by posl ASC";
 //echo $sql;
-$sqlq=mysqli_query($db, $sql);
+$sqlq=mysql_query($sql);
 $i=1;
-while($sb=mysqli_fetch_array($sqlq)){?>
+while($sb=mysql_fetch_array($sqlq)){?>
 <a target="_blank" href="./subcontractor/subConUtilization.php?siow=<? echo $siow;?>
 &itemCode=<? echo $sb[itemCode];?>&posl=<? echo $sb[posl];?>&edate=<? echo $ed;?>
 &rate=<? echo $sb[rate];?>"><?   echo poVendorName($sb[posl]).'-'.viewPosl($sb[posl]); ?></a>
@@ -380,12 +365,12 @@ $iss=0;
 $issQty=0;
 
 include("config.inc.php");
-$db = mysqli_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS, $SESS_DBNAME);
-	
+$db = mysql_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS);
+	mysql_select_db($SESS_DBNAME,$db);
 $sqls1 = "SELECT sum(qty) as total from `subut` WHERE siow='$siow' AND itemCode='$item' and pcode='$pp' AND edate<='$ed'";
 //echo $sqls1;
-$sqlruns1= mysqli_query($db, $sqls1);
-$out = mysqli_fetch_array($sqlruns1);
+$sqlruns1= mysql_query($sqls1);
+$out = mysql_fetch_array($sqlruns1);
 if($out[total]>0){
 	$iss=$out[total];
 	$issQty = number_format(($iss*100)/$qty,2);
@@ -400,20 +385,20 @@ $iss=0;
 $issQty=0;
 
 include("config.inc.php");
-$db = mysqli_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS, $SESS_DBNAME);
-	
+$db = mysql_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS);
+	mysql_select_db($SESS_DBNAME,$db);
 $sqls1 = "SELECT sum(qty*rate) as total from `subut` WHERE siow='$siow' AND itemCode='$item' and pcode='$pp' AND edate<='$ed'";
 //echo $sqls1;
-$sqlruns1= mysqli_query($db, $sqls1);
-$out = mysqli_fetch_array($sqlruns1);
+$sqlruns1= mysql_query($sqls1);
+$out = mysql_fetch_array($sqlruns1);
 if($out[total]>0){
 	$iss=$out[total];
 	}
 //echo "*iss:$iss*";
 $sqls11 = "SELECT (dmaQty*dmaRate) as total from `dma` WHERE dmasiow='$siow' AND dmaItemCode='$item'";
 //echo $sqls11;
-$sqlruns11= mysqli_query($db, $sqls11);
-$outp = mysqli_fetch_array($sqlruns11);
+$sqlruns11= mysql_query($sqls11);
+$outp = mysql_fetch_array($sqlruns11);
 if($outp[total]>0){
 	$issp=$outp[total];
 //	echo "*issp=$issp*";
@@ -429,13 +414,12 @@ $iss=0;
 $issQty=0;
 
 include("config.inc.php");
-$db = mysqli_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS, $SESS_DBNAME);
-	
+$db = mysql_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS);
+	mysql_select_db($SESS_DBNAME,$db);
 $sqls1 = "SELECT sum(issuedQty) as total from `issue$pp` WHERE siowId='$siow' AND itemCode='$item' AND issueDate<='$ed'";
 //echo $sqls1;
-$sqlruns1= mysqli_query($db, $sqls1);
-if(mysqli_affected_rows($db)<=0)return false;
-$out = mysqli_fetch_array($sqlruns1);
+$sqlruns1= mysql_query($sqls1);
+$out = mysql_fetch_array($sqlruns1);
 if($out[total]>0){
 	$iss=$out[total];
 	$issQty = number_format(($iss*100)/$qty);
@@ -451,20 +435,20 @@ $iss=0;
 $issQty=0;
 
 include("config.inc.php");
-$db = mysqli_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS, $SESS_DBNAME);
-	
+$db = mysql_connect($SESS_DBHOST, $SESS_DBUSER,$SESS_DBPASS);
+	mysql_select_db($SESS_DBNAME,$db);
 $sqls1 = "SELECT sum(issuedQty*issueRate) as total from `issue$pp` WHERE siowId='$siow' AND itemCode='$item' AND issueDate<='$ed'";
 //echo $sqls1;
-$sqlruns1= mysqli_query($db, $sqls1);
-$out = mysqli_fetch_array($sqlruns1);
+$sqlruns1= mysql_query($sqls1);
+$out = mysql_fetch_array($sqlruns1);
 if($out[total]>0){
 	$iss=$out[total];
 	}
 //echo "*iss:$iss*";
 $sqls11 = "SELECT (dmaQty*dmaRate) as total from `dma` WHERE dmasiow='$siow' AND dmaItemCode='$item'";
 //echo $sqls11;
-$sqlruns11= mysqli_query($db, $sqls11);
-$outp = mysqli_fetch_array($sqlruns11);
+$sqlruns11= mysql_query($sqls11);
+$outp = mysql_fetch_array($sqlruns11);
 if($outp[total]>0){
 	$issp=$outp[total];
 //	echo "*issp=$issp*";
